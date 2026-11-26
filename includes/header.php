@@ -2,6 +2,18 @@
 if (!ob_get_level()) {
     ob_start();
 }
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$currentPage = basename($_SERVER['PHP_SELF']);
+
+// Authentication Guard: require login for all protected ERP pages
+if (!isset($_SESSION['user']) && $currentPage !== 'login.php') {
+    header("Location: login.php");
+    exit;
+}
+
 require_once __DIR__ . '/../config/db.php';
 $pdo = getDB();
 
@@ -22,6 +34,20 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CAALAMI ELECTRONICS - ERP Management System</title>
+    <!-- Pre-paint Zoom Enforcement -->
+    <script>
+        (function() {
+            try {
+                var savedZoom = localStorage.getItem('caalami_erp_zoom');
+                if (savedZoom) {
+                    document.documentElement.style.zoom = savedZoom;
+                } else {
+                    document.documentElement.style.zoom = '1.08';
+                    localStorage.setItem('caalami_erp_zoom', '1.08');
+                }
+            } catch(e) {}
+        })();
+    </script>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -63,11 +89,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
         html {
-            font-size: 15.2px;
+            font-size: 16px;
+            zoom: 1.08;
         }
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.92rem;
+            font-size: 0.95rem;
             -webkit-font-smoothing: antialiased;
         }
         .font-mono {
@@ -75,9 +102,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         }
 
         /* Slightly enhance readability of custom micro-text */
-        .text-\[9px\] { font-size: 10.5px !important; }
-        .text-\[10px\] { font-size: 11.5px !important; }
-        .text-\[11px\] { font-size: 12.5px !important; }
+        .text-\[9px\] { font-size: 11px !important; }
+        .text-\[10px\] { font-size: 12px !important; }
+        .text-\[11px\] { font-size: 13px !important; }
 
         /* Sidebar Collapsed Mode Styles */
         #main-sidebar {

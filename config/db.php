@@ -27,6 +27,7 @@ function getDB() {
             ensurePurchaseTablesAndSeed($pdo);
             ensureSupplierTableAndSeed($pdo);
             ensureCategoryAndUnitTablesAndSeed($pdo);
+            ensureUsersTableAndSeed($pdo);
         } catch (PDOException $e) {
             die("Database Connection Error: " . $e->getMessage());
         }
@@ -566,6 +567,34 @@ function ensureCategoryAndUnitTablesAndSeed($pdo) {
         $cols = $pdo->query("SHOW COLUMNS FROM products")->fetchAll(PDO::FETCH_COLUMN);
         if (!in_array('subcategory', $cols)) {
             $pdo->exec("ALTER TABLE products ADD COLUMN subcategory VARCHAR(150) DEFAULT '' AFTER category");
+        }
+    } catch (Exception $e) {
+        // Continue silently
+    }
+}
+
+function ensureUsersTableAndSeed($pdo) {
+    try {
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(50) UNIQUE NOT NULL,
+                password VARCHAR(255) NOT NULL,
+                name VARCHAR(100) NOT NULL,
+                role VARCHAR(50) DEFAULT 'Admin',
+                branch VARCHAR(100) DEFAULT 'Boorama Branch',
+                status VARCHAR(20) DEFAULT 'Active',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        ");
+
+        $uCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+        if ($uCount == 0) {
+            $hashAdmin = password_hash('admin123', PASSWORD_DEFAULT);
+            $hashRidwaan = password_hash('123456', PASSWORD_DEFAULT);
+            $ins = $pdo->prepare("INSERT INTO users (username, password, name, role, branch) VALUES (?, ?, ?, ?, ?)");
+            $ins->execute(['admin', $hashAdmin, 'Ridwaan Admin', 'Admin', 'Boorama Branch']);
+            $ins->execute(['ridwaan', $hashRidwaan, 'Ridwaan', 'Admin', 'Boorama Branch']);
         }
     } catch (Exception $e) {
         // Continue silently

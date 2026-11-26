@@ -274,14 +274,46 @@ $isSalesTransOpen = in_array($currentPage, ['create_sales.php', 'sales_items.php
             </div>
         </div>
 
-        <!-- Repairs -->
-        <a href="exchanges.php?branch=<?= urlencode($currentBranch) ?>" class="flex items-center justify-between px-3 py-2 rounded-xl transition-all group text-slate-300 hover:text-white hover:bg-white/5 font-medium">
-            <span class="flex items-center gap-3">
-                <i data-lucide="wrench" class="w-4 h-4 text-slate-400 group-hover:text-white"></i>
-                <span>Repairs</span>
-            </span>
-            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300"></i>
-        </a>
+        <!-- Repairs Dropdown Parent (Matching user request) -->
+        <?php
+        $isRepairsOpen = in_array($currentPage, ['repairs.php', 'create_repair.php', 'repair_services.php', 'technicians.php', 'repair_ticket.php']);
+        ?>
+        <div class="space-y-1">
+            <button type="button" onclick="toggleRepairsMenu(event)" class="w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all group cursor-pointer <?= $isRepairsOpen ? 'bg-red-600 text-white font-bold shadow-md shadow-red-900/40' : 'text-slate-300 hover:text-white hover:bg-white/5 font-medium' ?>">
+                <span class="flex items-center gap-3">
+                    <i data-lucide="wrench" class="w-4 h-4 <?= $isRepairsOpen ? 'text-white' : 'text-slate-400 group-hover:text-white' ?>"></i>
+                    <span>Repairs</span>
+                </span>
+                <i data-lucide="chevron-down" id="repairs-chevron" class="w-3.5 h-3.5 <?= $isRepairsOpen ? 'text-white' : 'text-slate-500 group-hover:text-slate-300 -rotate-90' ?> transition-transform duration-200"></i>
+            </button>
+
+            <!-- Repairs Sub-Category Menu -->
+            <div id="sub-repairs" class="<?= $isRepairsOpen ? '' : 'hidden' ?> bg-[#0c0304]/90 rounded-2xl p-2 space-y-1 mt-1 border border-white/5">
+                <!-- 1. New Repair Job -->
+                <a href="create_repair.php?branch=<?= urlencode($currentBranch) ?>" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all <?= $currentPage === 'create_repair.php' ? 'bg-red-600 text-white font-bold' : 'text-slate-300 hover:text-white hover:bg-white/5 font-medium' ?>">
+                    <span class="w-2.5 h-2.5 rounded-full border border-slate-400 shrink-0 inline-block <?= $currentPage === 'create_repair.php' ? 'border-white bg-white' : '' ?>"></span>
+                    <span>New Repair Job</span>
+                </a>
+
+                <!-- 2. Repair List -->
+                <a href="repairs.php?branch=<?= urlencode($currentBranch) ?>" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all <?= $currentPage === 'repairs.php' ? 'bg-red-600 text-white font-bold' : 'text-slate-300 hover:text-white hover:bg-white/5 font-medium' ?>">
+                    <span class="w-2.5 h-2.5 rounded-full border border-slate-400 shrink-0 inline-block <?= $currentPage === 'repairs.php' ? 'border-white bg-white' : '' ?>"></span>
+                    <span>Repair List</span>
+                </a>
+
+                <!-- 3. Service Catalog -->
+                <a href="repair_services.php?branch=<?= urlencode($currentBranch) ?>" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all <?= $currentPage === 'repair_services.php' ? 'bg-red-600 text-white font-bold' : 'text-slate-300 hover:text-white hover:bg-white/5 font-medium' ?>">
+                    <span class="w-2.5 h-2.5 rounded-full border border-slate-400 shrink-0 inline-block <?= $currentPage === 'repair_services.php' ? 'border-white bg-white' : '' ?>"></span>
+                    <span>Service Catalog</span>
+                </a>
+
+                <!-- 4. Technicians -->
+                <a href="technicians.php?branch=<?= urlencode($currentBranch) ?>" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs transition-all <?= $currentPage === 'technicians.php' ? 'bg-red-600 text-white font-bold' : 'text-slate-300 hover:text-white hover:bg-white/5 font-medium' ?>">
+                    <span class="w-2.5 h-2.5 rounded-full border border-slate-400 shrink-0 inline-block <?= $currentPage === 'technicians.php' ? 'border-white bg-white' : '' ?>"></span>
+                    <span>Technicians</span>
+                </a>
+            </div>
+        </div>
 
         <!-- Section: FINANCIAL TRANSACTIONS -->
         <div class="sidebar-section-title pt-4 pb-1 px-3 text-[10px] font-black uppercase text-amber-500/90 tracking-wider">
@@ -349,6 +381,54 @@ $isSalesTransOpen = in_array($currentPage, ['create_sales.php', 'sales_items.php
             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300"></i>
         </a>
 
+        <!-- Section: REPORTS -->
+        <div class="sidebar-section-title pt-4 pb-1 px-3 text-[10px] font-black uppercase text-amber-500/90 tracking-wider">
+            Reports
+        </div>
+
+        <?php
+        $isReportsOpen = in_array($currentPage, ['repair_report.php', 'sales_report.php']);
+        $reportItems = [
+            ['label' => 'Repair Report', 'href' => 'repair_report.php?branch=' . urlencode($currentBranch), 'page' => 'repair_report.php'],
+            ['label' => 'Technician Costs Report', 'href' => 'technicians.php?report=costs&branch=' . urlencode($currentBranch), 'page' => ''],
+            ['label' => 'Expense Reports', 'href' => '#expense-reports', 'page' => ''],
+            ['label' => 'Liability Reports', 'href' => '#liability-reports', 'page' => ''],
+            ['label' => 'Customer Balance Reports', 'href' => '#customer-balance-reports', 'page' => ''],
+            ['label' => 'Customer History Report', 'href' => '#customer-history-report', 'page' => ''],
+            ['label' => 'Payment Report', 'href' => '#payment-report', 'page' => ''],
+            ['label' => 'Purchase Payment Report', 'href' => '#purchase-payment-report', 'page' => ''],
+            ['label' => 'Sales Payment Report', 'href' => '#sales-payment-report', 'page' => ''],
+            ['label' => 'Sales Report', 'href' => 'sales_report.php?branch=' . urlencode($currentBranch), 'page' => 'sales_report.php'],
+            ['label' => 'Inventory Report', 'href' => '#inventory-report', 'page' => ''],
+            ['label' => 'Purchase Report', 'href' => '#purchase-report', 'page' => ''],
+            ['label' => 'Exchange Report', 'href' => '#exchange-report', 'page' => ''],
+            ['label' => 'Balance Sheet', 'href' => '#balance-sheet', 'page' => ''],
+            ['label' => 'Income Statement', 'href' => '#income-statement', 'page' => ''],
+            ['label' => 'Bank Statement Report', 'href' => '#bank-statement-report', 'page' => ''],
+            ['label' => 'Finance Activity Report', 'href' => '#finance-activity-report', 'page' => ''],
+        ];
+        ?>
+        <div class="space-y-1">
+            <button type="button" onclick="toggleReportsMenu(event)" class="w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all group cursor-pointer <?= $isReportsOpen ? 'bg-red-600 text-white font-bold shadow-md shadow-red-900/40' : 'text-slate-300 hover:text-white hover:bg-white/5 font-medium' ?>">
+                <span class="flex items-center gap-3">
+                    <i data-lucide="trending-up" class="w-4 h-4 <?= $isReportsOpen ? 'text-white' : 'text-slate-400 group-hover:text-white' ?>"></i>
+                    <span>System Reports</span>
+                </span>
+                <i data-lucide="chevron-down" id="reports-chevron" class="w-3.5 h-3.5 <?= $isReportsOpen ? 'text-white' : 'text-slate-500 group-hover:text-slate-300 -rotate-90' ?> transition-transform duration-200"></i>
+            </button>
+
+            <div id="sub-reports" class="<?= $isReportsOpen ? '' : 'hidden' ?> bg-[#0c0304]/90 rounded-2xl p-2 space-y-0.5 mt-1 border border-white/5">
+                <?php foreach ($reportItems as $ri):
+                    $isActiveRep = (!empty($ri['page']) && $currentPage === $ri['page']);
+                ?>
+                    <a href="<?= $ri['href'] ?>" class="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs transition-all <?= $isActiveRep ? 'bg-red-600 text-white font-bold shadow-md shadow-red-900/40' : 'text-slate-300 hover:text-white hover:bg-white/5 font-medium' ?>">
+                        <span class="w-2 h-2 rounded-full shrink-0 inline-block <?= $isActiveRep ? 'bg-amber-400 shadow-[0_0_6px_#f59e0b]' : 'border border-slate-500' ?>"></span>
+                        <span class="truncate"><?= htmlspecialchars($ri['label']) ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
         <!-- Section: ACTIVITIES -->
         <div class="sidebar-section-title pt-4 pb-1 px-3 text-[10px] font-black uppercase text-amber-500/90 tracking-wider">
             Activities
@@ -369,6 +449,17 @@ $isSalesTransOpen = in_array($currentPage, ['create_sales.php', 'sales_items.php
             </span>
             <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-500 group-hover:text-slate-300"></i>
         </a>
+
+        <!-- Logout Link in Sidebar -->
+        <div class="pt-4 pb-1">
+            <a href="logout.php" onclick="return confirm('Ma hubtaa inaad ka baxdo nidaamka (Log Out)?');" class="flex items-center justify-between px-3 py-2 rounded-xl transition-all group text-red-400 hover:text-white hover:bg-red-600/25 font-bold border border-red-900/30">
+                <span class="flex items-center gap-3">
+                    <i data-lucide="log-out" class="w-4 h-4 text-red-500 group-hover:text-red-400"></i>
+                    <span>Log Out</span>
+                </span>
+                <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-red-500/50"></i>
+            </a>
+        </div>
     </nav>
 </aside>
 
@@ -457,6 +548,30 @@ function togglePaymentMenu(e) {
     }
 }
 
+function toggleReportsMenu(e) {
+    if (e) e.preventDefault();
+    const menu = document.getElementById('sub-reports');
+    const chevron = document.getElementById('reports-chevron');
+    if (menu) {
+        menu.classList.toggle('hidden');
+    }
+    if (chevron) {
+        chevron.classList.toggle('-rotate-90');
+    }
+}
+
+function toggleRepairsMenu(e) {
+    if (e) e.preventDefault();
+    const menu = document.getElementById('sub-repairs');
+    const chevron = document.getElementById('repairs-chevron');
+    if (menu) {
+        menu.classList.toggle('hidden');
+    }
+    if (chevron) {
+        chevron.classList.toggle('-rotate-90');
+    }
+}
+
 function toggleSidebarCollapse() {
     const sidebar = document.getElementById('main-sidebar');
     const discIcon = document.getElementById('sidebar-disc-icon');
@@ -488,6 +603,39 @@ function toggleSidebarCollapse() {
         }
     } catch(err) {}
 })();
+// Zoom Management Functions
+function updateZoomDisplay(val) {
+    const el = document.getElementById('system-zoom-display');
+    if (el) el.textContent = Math.round(val * 100) + '%';
+}
+
+function adjustSystemZoom(delta) {
+    try {
+        let current = parseFloat(localStorage.getItem('caalami_erp_zoom') || '1.08');
+        current = Math.min(1.40, Math.max(0.85, current + delta));
+        current = Math.round(current * 100) / 100;
+        document.documentElement.style.zoom = current;
+        localStorage.setItem('caalami_erp_zoom', current.toString());
+        updateZoomDisplay(current);
+    } catch(err) {}
+}
+
+function resetSystemZoom() {
+    try {
+        const defaultZoom = '1.08';
+        document.documentElement.style.zoom = defaultZoom;
+        localStorage.setItem('caalami_erp_zoom', defaultZoom);
+        updateZoomDisplay(1.08);
+    } catch(err) {}
+}
+
+// Initialize Zoom display
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        const current = parseFloat(localStorage.getItem('caalami_erp_zoom') || '1.08');
+        updateZoomDisplay(current);
+    } catch(err) {}
+});
 </script>
 
 <!-- Right Main Column Wrapper -->
@@ -506,7 +654,20 @@ function toggleSidebarCollapse() {
         </div>
 
         <!-- Right Side Icons & Profile -->
-        <div class="flex items-center gap-2.5 sm:gap-3.5">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Zoom Controls (Quick Zoom in / out / reset) -->
+            <div class="hidden sm:flex items-center bg-slate-100/90 hover:bg-slate-200/90 border border-slate-200/90 rounded-xl px-1.5 py-1 text-slate-700 text-xs font-bold transition-all shadow-2xs" title="Adjust System Zoom">
+                <button type="button" onclick="adjustSystemZoom(-0.05)" class="w-6 h-6 rounded-lg hover:bg-white flex items-center justify-center text-slate-600 hover:text-red-600 transition-colors cursor-pointer" title="Zoom Out (Yaree)">
+                    <i data-lucide="minus" class="w-3 h-3"></i>
+                </button>
+                <button type="button" onclick="resetSystemZoom()" id="system-zoom-display" class="px-2 py-0.5 text-[11px] font-extrabold text-slate-700 hover:text-[#c00000] cursor-pointer tracking-tight" title="Guji si aad dib ugu celiso (Reset to 108%)">
+                    108%
+                </button>
+                <button type="button" onclick="adjustSystemZoom(0.05)" class="w-6 h-6 rounded-lg hover:bg-white flex items-center justify-center text-slate-600 hover:text-red-600 transition-colors cursor-pointer" title="Zoom In (Weynee)">
+                    <i data-lucide="plus" class="w-3 h-3"></i>
+                </button>
+            </div>
+
             <!-- Red Delivery Icon -->
             <a href="deliveries.php" class="w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-all hover:scale-105 shadow-xs" title="Deliveries">
                 <i data-lucide="truck" class="w-4 h-4"></i>
@@ -517,15 +678,23 @@ function toggleSidebarCollapse() {
                 <i data-lucide="shopping-cart" class="w-4 h-4"></i>
             </a>
 
-            <!-- User Profile Badge -->
+            <!-- User Profile Badge & Logout -->
+            <?php
+            $userName = $_SESSION['user']['name'] ?? 'Admin';
+            $userRole = $_SESSION['user']['role'] ?? 'ADMIN';
+            $userInitial = strtoupper(substr($userName, 0, 1));
+            ?>
             <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
                 <div class="w-8 h-8 rounded-full ring-2 ring-red-500 overflow-hidden bg-gradient-to-tr from-red-600 to-amber-500 text-white flex items-center justify-center font-black text-xs shadow-xs">
-                    R
+                    <?= $userInitial ?>
                 </div>
                 <div class="hidden sm:block text-left">
-                    <span class="block text-xs font-bold text-slate-800 leading-tight">Ridwaan..Admin</span>
-                    <span class="inline-block text-[9px] font-extrabold text-red-600 tracking-wider uppercase leading-none">ADMIN</span>
+                    <span class="block text-xs font-bold text-slate-800 leading-tight"><?= htmlspecialchars($userName) ?></span>
+                    <span class="inline-block text-[9px] font-extrabold text-red-600 tracking-wider uppercase leading-none"><?= htmlspecialchars($userRole) ?></span>
                 </div>
+                <a href="logout.php" onclick="return confirm('Ma hubtaa inaad ka baxdo nidaamka (Log Out)?');" class="ml-1 p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Log Out">
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
+                </a>
             </div>
         </div>
     </header>
