@@ -20,13 +20,25 @@ $errorMsg = '';
 if (isset($_GET['delete_id'])) {
     $delId = intval($_GET['delete_id']);
 
-    // Reverse technician balance if assigned
-    $jStmt = $pdo->prepare("SELECT technician_id, technician_cost FROM repair_jobs WHERE id = ?");
+    // Reverse technician balance & customer debt if assigned
+    $jStmt = $pdo->prepare("SELECT technician_id, technician_cost, customer_id, customer_name, total_amount, paid_amount FROM repair_jobs WHERE id = ?");
     $jStmt->execute([$delId]);
     $delJob = $jStmt->fetch(PDO::FETCH_ASSOC);
     if ($delJob && intval($delJob['technician_id']) > 0 && floatval($delJob['technician_cost']) > 0) {
         $pdo->prepare("UPDATE technicians SET balance = GREATEST(0, balance - ?) WHERE id = ?")
             ->execute([floatval($delJob['technician_cost']), intval($delJob['technician_id'])]);
+    }
+    if ($delJob) {
+        $delDue = max(0, floatval($delJob['total_amount']) - floatval($delJob['paid_amount']));
+        if ($delDue > 0) {
+            if (intval($delJob['customer_id']) > 0) {
+                $pdo->prepare("UPDATE customers SET balance = GREATEST(0, balance - ?) WHERE id = ?")
+                    ->execute([$delDue, intval($delJob['customer_id'])]);
+            } elseif (!empty($delJob['customer_name'])) {
+                $pdo->prepare("UPDATE customers SET balance = GREATEST(0, balance - ?) WHERE name = ?")
+                    ->execute([$delDue, $delJob['customer_name']]);
+            }
+        }
     }
 
     // Restore spare parts stock back to inventory

@@ -89,6 +89,13 @@ $countStmt->execute($params);
 $totalRecords = $countStmt->fetchColumn();
 $totalPages = ceil($totalRecords / $perPage);
 
+// Fetch customers with outstanding debt (balance > 0)
+$debtors = $pdo->query("SELECT id, name, phone, balance FROM customers WHERE balance > 0 ORDER BY balance DESC")->fetchAll(PDO::FETCH_ASSOC);
+$totalDebtorsSum = 0.00;
+foreach ($debtors as $d) {
+    $totalDebtorsSum += floatval($d['balance']);
+}
+
 // Fetch data
 $sql = "SELECT * FROM payments WHERE {$whereSql} ORDER BY id DESC LIMIT {$perPage} OFFSET {$offset}";
 $stmt = $pdo->prepare($sql);
@@ -115,6 +122,49 @@ $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <span><?= htmlspecialchars($successMsg) ?></span>
             <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800">×</button>
         </div>
+    <?php endif; ?>
+
+    <!-- Customers With Outstanding Debt (Dadka Daynta Lagu Leeyahay) -->
+    <?php if (!empty($debtors)): ?>
+    <div class="bg-white rounded-2xl border border-red-200/90 shadow-xs overflow-hidden">
+        <div class="px-4 py-3 bg-red-50/70 border-b border-red-100 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600"></i>
+                <h2 class="text-xs font-black text-red-700 uppercase tracking-wider">Dadka Daynta Lagu Leeyahay (Customers With Debt)</h2>
+                <span class="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black"><?= count($debtors) ?></span>
+            </div>
+            <span class="text-xs font-black text-red-700">Total Due: $<?= number_format($totalDebtorsSum, 2) ?></span>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs whitespace-nowrap">
+                <thead class="bg-slate-50 text-slate-500 font-black text-[10px] uppercase border-b border-slate-100">
+                    <tr>
+                        <th class="py-2.5 px-4">#</th>
+                        <th class="py-2.5 px-4">Customer Name</th>
+                        <th class="py-2.5 px-4">Phone</th>
+                        <th class="py-2.5 px-4 text-right">Outstanding Debt ($)</th>
+                        <th class="py-2.5 px-4 text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <?php foreach ($debtors as $idx => $deb): ?>
+                        <tr class="hover:bg-red-50/30">
+                            <td class="py-2.5 px-4 text-slate-400 font-bold"><?= $idx + 1 ?></td>
+                            <td class="py-2.5 px-4 font-bold text-slate-800"><?= htmlspecialchars($deb['name']) ?></td>
+                            <td class="py-2.5 px-4 text-slate-500"><?= htmlspecialchars($deb['phone'] ?: '—') ?></td>
+                            <td class="py-2.5 px-4 text-right font-mono font-black text-red-600">$<?= number_format($deb['balance'], 2) ?></td>
+                            <td class="py-2.5 px-4 text-center">
+                                <a href="add_payment.php?customer_id=<?= $deb['id'] ?>" class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#c00000] hover:bg-red-700 text-white font-bold text-[11px] shadow-2xs transition-colors">
+                                    <i data-lucide="credit-card" class="w-3 h-3"></i>
+                                    <span>Pay Now</span>
+                                </a>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
     <?php endif; ?>
 
     <!-- Filter Card matching Image 4 -->

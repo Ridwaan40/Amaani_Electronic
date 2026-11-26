@@ -96,12 +96,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_repair_job'])) {
         $errorMsg = "Fadlan buuxi Macmiilka, Qalabka (Device Model), iyo Dhibaatada jirta (Problem Description).";
     } else {
         if ($editId > 0) {
-            // Reverse old technician balance before applying updated technician cost
+            // Reverse old technician balance & old customer repair debt before applying updates
             if ($editJob) {
                 $oldTechId = intval($editJob['technician_id'] ?? 0);
                 $oldTechCost = floatval($editJob['technician_cost'] ?? 0);
                 if ($oldTechId > 0 && $oldTechCost > 0) {
                     $pdo->prepare("UPDATE technicians SET balance = GREATEST(0, balance - ?) WHERE id = ?")->execute([$oldTechCost, $oldTechId]);
+                }
+
+                $oldCustId = intval($editJob['customer_id'] ?? 0);
+                $oldCustName = trim($editJob['customer_name'] ?? '');
+                $oldDue = max(0, floatval($editJob['total_amount']) - floatval($editJob['paid_amount']));
+                if ($oldDue > 0) {
+                    if ($oldCustId > 0) {
+                        $pdo->prepare("UPDATE customers SET balance = GREATEST(0, balance - ?) WHERE id = ?")->execute([$oldDue, $oldCustId]);
+                    } elseif (!empty($oldCustName)) {
+                        $pdo->prepare("UPDATE customers SET balance = GREATEST(0, balance - ?) WHERE name = ?")->execute([$oldDue, $oldCustName]);
+                    }
                 }
             }
 
@@ -133,6 +144,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_repair_job'])) {
             if ($techId > 0 && $techCost > 0) {
                 $pdo->prepare("UPDATE technicians SET balance = balance + ? WHERE id = ?")->execute([$techCost, $techId]);
             }
+
+            // Add updated unpaid repair debt to customer's balance
+            $newDue = max(0, $totalAmount - $paidAmount);
+            if ($newDue > 0) {
+                if ($customerId > 0) {
+                    $pdo->prepare("UPDATE customers SET balance = balance + ? WHERE id = ?")->execute([$newDue, $customerId]);
+                } elseif (!empty($customerName)) {
+                    $pdo->prepare("UPDATE customers SET balance = balance + ? WHERE name = ?")->execute([$newDue, $customerName]);
+                }
+            }
         } else {
             // Generate Job Number e.g. REP-20261124-7890
             $randomSuffix = rand(1000, 9999);
@@ -158,6 +179,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_repair_job'])) {
             // Credit technician's balance if technician cost assigned
             if ($techId > 0 && $techCost > 0) {
                 $pdo->prepare("UPDATE technicians SET balance = balance + ? WHERE id = ?")->execute([$techCost, $techId]);
+            }
+
+            // Add unpaid repair debt to customer's balance
+            $newDue = max(0, $totalAmount - $paidAmount);
+            if ($newDue > 0) {
+                if ($customerId > 0) {
+                    $pdo->prepare("UPDATE customers SET balance = balance + ? WHERE id = ?")->execute([$newDue, $customerId]);
+                } elseif (!empty($customerName)) {
+                    $pdo->prepare("UPDATE customers SET balance = balance + ? WHERE name = ?")->execute([$newDue, $customerName]);
+                }
             }
         }
 

@@ -16,6 +16,17 @@ function safeRedirect($url) {
 $errorMsg = '';
 $allCustomers = $pdo->query("SELECT id, name, phone, balance, address FROM customers ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 
+$prefillCustId = intval($_GET['customer_id'] ?? 0);
+$prefillCust = null;
+if ($prefillCustId > 0) {
+    foreach ($allCustomers as $c) {
+        if (intval($c['id']) === $prefillCustId) {
+            $prefillCust = $c;
+            break;
+        }
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_payment'])) {
     $customerId = intval($_POST['customer_id'] ?? 0);
     $customerName = trim($_POST['customer_name'] ?? '');
@@ -85,6 +96,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_payment'])) {
             $updCust->execute([$calculatedRem, $customerName]);
         }
 
+        // Also settle any unpaid repair jobs for this customer (oldest first)
+        $toApply = $paidAmount + $discount;
+        if ($toApply > 0) {
+            if ($customerId > 0) {
+                $rStmt = $pdo->prepare("SELECT id, total_amount, paid_amount FROM repair_jobs WHERE (customer_id = ? OR customer_name = ?) AND paid_amount < total_amount ORDER BY id ASC");
+                $rStmt->execute([$customerId, $customerName]);
+            } else {
+                $rStmt = $pdo->prepare("SELECT id, total_amount, paid_amount FROM repair_jobs WHERE customer_name = ? AND paid_amount < total_amount ORDER BY id ASC");
+                $rStmt->execute([$customerName]);
+            }
+            $updRep = $pdo->prepare("UPDATE repair_jobs SET paid_amount = paid_amount + ? WHERE id = ?");
+            foreach ($rStmt->fetchAll(PDO::FETCH_ASSOC) as $rj) {
+                if ($toApply <= 0) break;
+                $rjDue = max(0, floatval($rj['total_amount']) - floatval($rj['paid_amount']));
+                $payHere = min($toApply, $rjDue);
+                if ($payHere > 0) {
+                    $updRep->execute([$payHere, $rj['id']]);
+                    $toApply -= $payHere;
+                }
+            }
+        }
+
         safeRedirect("payments.php?success=1");
     }
 }
@@ -114,8 +147,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_payment'])) {
     <div class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-6">
         <form method="POST" id="paymentForm" class="space-y-5">
             <input type="hidden" name="save_payment" value="1">
-            <input type="hidden" name="customer_id" id="selected_customer_id" value="">
-            <input type="hidden" name="customer_phone" id="selected_customer_phone" value="">
+            <input type="hidden" name="customer_id" id="selected_customer_id" value="<?= $prefillCust ? $prefillCust['id'] : '' ?>">
+            <input type="hidden" name="customer_phone" id="selected_customer_phone" value="<?= $prefillCust ? htmlspecialchars($prefillCust['phone']) : '' ?>">
 
             <!-- Row 1: Customer Name & Transaction Type -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -123,6 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_payment'])) {
                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Customer Name <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <input list="customerList" id="customer_name_input" name="customer_name" required 
+                               value="<?= $prefillCust ? htmlspecialchars($prefillCust['name']) : '' ?>"
                                placeholder="Search Customer..." autocomplete="off"
                                oninput="onCustomerInput(this.value)"
                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs text-slate-900 placeholder:text-slate-400 focus:border-red-600 outline-none transition-all">
@@ -226,6 +260,13 @@ function calculateBalance() {
     const rem = Math.max(0, prev - (paid + disc));
     document.getElementById('remaining_balance').value = rem.toFixed(2);
 }
+
+<?php if ($prefillCust): ?>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('previous_balance').value = parseFloat(<?= json_encode($prefillCust['balance']) ?> || 0).toFixed(2);
+    calculateBalance();
+});
+<?php endif; ?>
 </script>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
