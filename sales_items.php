@@ -11,7 +11,7 @@ $perPage         = intval($_GET['per_page'] ?? 25);
 if ($perPage <= 0) $perPage = 25;
 
 // ── Build query ──────────────────────────────────────────────────────────────
-$where  = ["1=1"];
+$where  = ["1=1", "si.sale_type != 'Returned'"];
 $params = [];
 
 if ($currentBranch !== 'All Branches') {

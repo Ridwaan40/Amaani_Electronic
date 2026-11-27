@@ -15,7 +15,7 @@ $viewMode        = trim($_GET['view']       ?? 'item'); // 'item' | 'invoice'
 if ($perPage <= 0) $perPage = 25;
 
 // ── Build query ──────────────────────────────────────────────────────────────
-$where  = ["1=1"];
+$where  = ["1=1", "si.sale_type != 'Returned'"];
 $params = [];
 
 if ($currentBranch !== 'All Branches') {
@@ -330,7 +330,7 @@ foreach ($items as $it) {
                         $payMethod = $it['payment_method'] ?? 'Cash On Hand';
                         $notes = $it['sale_notes'] ?? '';
                     ?>
-                    <tr class="hover:bg-slate-50/80 transition-colors">
+                    <tr class="hover:bg-slate-50/80 transition-colors" id="sale-row-<?= $id ?>">
                         <!-- REF -->
                         <td class="py-3 px-3 font-semibold">
                             <span class="inline-block bg-slate-100 text-slate-800 px-2 py-0.5 rounded text-[11px] font-mono font-bold border border-slate-200 cursor-pointer hover:bg-red-50 hover:text-red-700" onclick="openSoldProductsModal('<?= htmlspecialchars($cleanTx, ENT_QUOTES) ?>')">
@@ -973,8 +973,19 @@ function returnSaleItemRow(id, name, qty) {
     .then(r => r.json())
     .then(res => {
         if (res.success) {
-            alert(`Returned ${res.qty_returned} qty of "${res.product}". Stock restored.`);
-            location.reload();
+            // Remove row from DOM immediately — no page reload needed
+            const row = document.getElementById('sale-row-' + id);
+            if (row) {
+                row.style.transition = 'opacity 0.3s';
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 300);
+            }
+            // Show brief toast/alert
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 z-50 bg-emerald-600 text-white text-sm font-bold px-5 py-3 rounded-xl shadow-lg';
+            toast.textContent = `✅ Returned ${res.qty_returned} qty of "${res.product}". Stock restored.`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
         } else {
             alert('Error returning item: ' + (res.error || 'Failed to return.'));
         }
