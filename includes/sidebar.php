@@ -25,11 +25,11 @@ $isSalesTransOpen = in_array($currentPage, ['create_sales.php', 'sales_items.php
     <!-- Brand / Header -->
     <div class="sidebar-header-box p-4 flex items-center justify-between border-b border-white/5">
         <a href="index.php" class="flex items-center gap-2.5 group overflow-hidden">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#c00000] to-red-500 flex items-center justify-center text-white shadow-md shadow-red-900/50 font-black text-sm group-hover:scale-105 transition-transform shrink-0">
-                CE
+            <div class="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-md shadow-red-900/50 group-hover:scale-105 transition-transform shrink-0 overflow-hidden">
+                <img src="assets/images/amaani-logo.jpg" alt="Amaani" class="w-full h-full object-contain">
             </div>
             <div class="sidebar-brand-text">
-                <span class="font-black text-xs tracking-wider text-white uppercase block leading-tight">CAALAMI</span>
+                <span class="font-black text-xs tracking-wider text-white uppercase block leading-tight">AMAANI</span>
                 <span class="text-[9px] text-red-400 font-semibold uppercase tracking-widest block leading-tight">ELECTRONICS</span>
             </div>
         </a>
@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <i data-lucide="menu" class="w-5 h-5"></i>
             </button>
             <div>
-                <h2 class="text-sm sm:text-base font-black tracking-tight text-[#c00000] uppercase leading-tight">CAALAMI ELECTRONICS</h2>
+                <h2 class="text-sm sm:text-base font-black tracking-tight text-[#c00000] uppercase leading-tight">AMAANI ELECTRONICS</h2>
                 <p class="text-[10px] sm:text-[11px] text-slate-400 font-medium leading-tight">Hoyga Qalabka Elektaroonigga ah &amp; Qalabka Casriga ah</p>
             </div>
         </div>

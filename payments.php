@@ -13,11 +13,29 @@ function safeRedirect($url) {
     }
 }
 
-// Handle Delete Payment
+// Handle Delete Payment (reverse credit record back to customer balance)
 if (isset($_GET['delete_id'])) {
     $delId = intval($_GET['delete_id']);
+    $pStmt = $pdo->prepare("SELECT customer_name, amount, discount FROM payments WHERE id = ?");
+    $pStmt->execute([$delId]);
+    $pRow = $pStmt->fetch(PDO::FETCH_ASSOC);
+    if ($pRow) {
+        $reverseAmt = floatval($pRow['amount']) + floatval($pRow['discount']);
+        if ($reverseAmt > 0 && !empty($pRow['customer_name'])) {
+            $pdo->prepare("UPDATE customers SET balance = balance + ? WHERE name = ?")->execute([$reverseAmt, $pRow['customer_name']]);
+        }
+    }
     $delStmt = $pdo->prepare("DELETE FROM payments WHERE id = ?");
     $delStmt->execute([$delId]);
+    safeRedirect("payments.php?deleted=1");
+}
+
+// Handle Delete Debtor Balance (clear unpaid debt record)
+if (isset($_GET['clear_debt_id'])) {
+    $custId = intval($_GET['clear_debt_id']);
+    if ($custId > 0) {
+        $pdo->prepare("UPDATE customers SET balance = 0.00 WHERE id = ?")->execute([$custId]);
+    }
     safeRedirect("payments.php?deleted=1");
 }
 
@@ -89,12 +107,25 @@ $countStmt->execute($params);
 $totalRecords = $countStmt->fetchColumn();
 $totalPages = ceil($totalRecords / $perPage);
 
-// Fetch customers with outstanding debt (balance > 0)
-$debtors = $pdo->query("SELECT id, name, phone, balance FROM customers WHERE balance > 0 ORDER BY balance DESC")->fetchAll(PDO::FETCH_ASSOC);
-$totalDebtorsSum = 0.00;
-foreach ($debtors as $d) {
-    $totalDebtorsSum += floatval($d['balance']);
+// Fetch customers with outstanding debt (balance > 0) applying matching filters
+$debtorWhere = ["balance > 0"];
+$debtorParams = [];
+if (!empty($filterCust) && $filterCust !== 'All Customers') {
+    $debtorWhere[] = "name = ?";
+    $debtorParams[] = $filterCust;
 }
+if (!empty($filterPhone)) {
+    $debtorWhere[] = "phone LIKE ?";
+    $debtorParams[] = "%{$filterPhone}%";
+}
+if (!empty($search)) {
+    $debtorWhere[] = "(name LIKE ? OR phone LIKE ?)";
+    $debtorParams[] = "%{$search}%";
+    $debtorParams[] = "%{$search}%";
+}
+$debtorStmt = $pdo->prepare("SELECT id, name, phone, balance FROM customers WHERE " . implode(" AND ", $debtorWhere) . " ORDER BY balance DESC");
+$debtorStmt->execute($debtorParams);
+$debtors = $debtorStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch data
 $sql = "SELECT * FROM payments WHERE {$whereSql} ORDER BY id DESC LIMIT {$perPage} OFFSET {$offset}";
@@ -122,49 +153,6 @@ $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <span><?= htmlspecialchars($successMsg) ?></span>
             <button onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-800">×</button>
         </div>
-    <?php endif; ?>
-
-    <!-- Customers With Outstanding Debt (Dadka Daynta Lagu Leeyahay) -->
-    <?php if (!empty($debtors)): ?>
-    <div class="bg-white rounded-2xl border border-red-200/90 shadow-xs overflow-hidden">
-        <div class="px-4 py-3 bg-red-50/70 border-b border-red-100 flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-                <i data-lucide="alert-circle" class="w-4 h-4 text-red-600"></i>
-                <h2 class="text-xs font-black text-red-700 uppercase tracking-wider">Dadka Daynta Lagu Leeyahay (Customers With Debt)</h2>
-                <span class="px-2 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-black"><?= count($debtors) ?></span>
-            </div>
-            <span class="text-xs font-black text-red-700">Total Due: $<?= number_format($totalDebtorsSum, 2) ?></span>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs whitespace-nowrap">
-                <thead class="bg-slate-50 text-slate-500 font-black text-[10px] uppercase border-b border-slate-100">
-                    <tr>
-                        <th class="py-2.5 px-4">#</th>
-                        <th class="py-2.5 px-4">Customer Name</th>
-                        <th class="py-2.5 px-4">Phone</th>
-                        <th class="py-2.5 px-4 text-right">Outstanding Debt ($)</th>
-                        <th class="py-2.5 px-4 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                    <?php foreach ($debtors as $idx => $deb): ?>
-                        <tr class="hover:bg-red-50/30">
-                            <td class="py-2.5 px-4 text-slate-400 font-bold"><?= $idx + 1 ?></td>
-                            <td class="py-2.5 px-4 font-bold text-slate-800"><?= htmlspecialchars($deb['name']) ?></td>
-                            <td class="py-2.5 px-4 text-slate-500"><?= htmlspecialchars($deb['phone'] ?: '—') ?></td>
-                            <td class="py-2.5 px-4 text-right font-mono font-black text-red-600">$<?= number_format($deb['balance'], 2) ?></td>
-                            <td class="py-2.5 px-4 text-center">
-                                <a href="add_payment.php?customer_id=<?= $deb['id'] ?>" class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#c00000] hover:bg-red-700 text-white font-bold text-[11px] shadow-2xs transition-colors">
-                                    <i data-lucide="credit-card" class="w-3 h-3"></i>
-                                    <span>Pay Now</span>
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
     <?php endif; ?>
 
     <!-- Filter Card matching Image 4 -->
@@ -271,11 +259,43 @@ $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    <?php if (empty($payments)): ?>
+                    <?php if (empty($payments) && empty($debtors)): ?>
                         <tr>
-                            <td colspan="12" class="py-8 text-center text-slate-400 font-medium">No credit payments recorded yet.</td>
+                            <td colspan="12" class="py-8 text-center text-slate-400 font-medium">No credit payments or outstanding debts found.</td>
                         </tr>
                     <?php else: ?>
+                        <?php foreach ($debtors as $deb): ?>
+                        <tr class="bg-red-50/30 hover:bg-red-50/60 transition-colors">
+                            <td class="py-3 px-3.5">
+                                <span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-black text-[10px] uppercase">DUE</span>
+                            </td>
+                            <td class="py-3 px-3.5 font-bold text-slate-800 uppercase"><?= htmlspecialchars($deb['name']) ?></td>
+                            <td class="py-3 px-3.5 font-mono text-slate-600"><?= !empty($deb['phone']) ? htmlspecialchars($deb['phone']) : '-' ?></td>
+                            <td class="py-3 px-3.5 font-medium text-slate-700">$<?= number_format($deb['balance'], 2, '.', '') ?></td>
+                            <td class="py-3 px-3.5 font-medium text-slate-400">$0.00</td>
+                            <td class="py-3 px-3.5 font-bold text-slate-400">$0.00</td>
+                            <td class="py-3 px-3.5 font-black text-[#c00000]">$<?= number_format($deb['balance'], 2, '.', '') ?></td>
+                            <td class="py-3 px-3.5">
+                                <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 font-bold text-[10px]">Unpaid / Dayn</span>
+                            </td>
+                            <td class="py-3 px-3.5 text-slate-600"><?= htmlspecialchars($currentBranch) ?></td>
+                            <td class="py-3 px-3.5 text-slate-400 italic">Pending</td>
+                            <td class="py-3 px-3.5 font-mono text-slate-400">—</td>
+                            <td class="py-3 px-3.5 text-center">
+                                <div class="inline-flex items-center gap-1.5">
+                                    <a href="add_payment.php?customer_id=<?= $deb['id'] ?>" class="px-2.5 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors">
+                                        Pay Now
+                                    </a>
+                                    <a href="payment_receipt.php?customer_id=<?= $deb['id'] ?>" class="px-2.5 py-1 rounded bg-[#c00000] hover:bg-red-700 text-white font-bold text-[11px] transition-colors">
+                                        Invoice
+                                    </a>
+                                    <button type="button" onclick="openDeleteModal('payments.php?clear_debt_id=<?= $deb['id'] ?>')" class="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-[11px] transition-colors cursor-pointer">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
                         <?php foreach ($payments as $p): 
                             $dispId = '#' . ($p['id'] + 349); // Matching #359 format in image 4
                             $userDisplay = !empty($p['created_user']) ? $p['created_user'] : 'N/A';
@@ -303,16 +323,15 @@ $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td class="py-3 px-3.5 font-mono text-slate-500"><?= $dateDisplay ?></td>
                             <td class="py-3 px-3.5 text-center">
                                 <div class="inline-flex items-center gap-1.5">
-                                    <button type="button" 
-                                            onclick='openReceiptModal(<?= json_encode($p) ?>, "<?= $dispId ?>", "<?= $dateDisplay ?>")'
-                                            class="px-2.5 py-1 rounded bg-[#c00000] hover:bg-red-700 text-white font-bold text-[11px] transition-colors cursor-pointer">
+                                    <a href="payment_receipt.php?id=<?= $p['id'] ?>"
+                                       class="px-2.5 py-1 rounded bg-[#c00000] hover:bg-red-700 text-white font-bold text-[11px] transition-colors">
                                         Invoice
-                                    </button>
-                                    <a href="payments.php?delete_id=<?= $p['id'] ?>" 
-                                       onclick="return confirm('Ma hubtaa inaad tirtirto lacag-bixintan: <?= $dispId ?>?');"
-                                       class="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-[11px] transition-colors">
-                                        Delete
                                     </a>
+                                    <button type="button"
+                                            onclick="openDeleteModal('payments.php?delete_id=<?= $p['id'] ?>')"
+                                            class="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-[11px] transition-colors cursor-pointer">
+                                        Delete
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -372,7 +391,7 @@ $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div id="printArea" class="space-y-4 text-xs font-sans">
             <!-- Header -->
             <div class="text-center border-b pb-3 space-y-1">
-                <h2 class="text-base font-black text-red-600 tracking-wider uppercase">CAALAMI ELECTRONICS</h2>
+                <h2 class="text-base font-black text-red-600 tracking-wider uppercase">AMAANI ELECTRONICS</h2>
                 <p class="text-[10px] text-slate-500">Official Credit Payment Receipt</p>
                 <div class="text-[10px] font-mono font-bold text-slate-700" id="rec_number">#REC-000</div>
             </div>
@@ -462,6 +481,36 @@ function openReceiptModal(p, dispId, dateStr) {
 function closeReceiptModal() {
     document.getElementById('receiptModal').classList.add('hidden');
 }
+
+function openDeleteModal(deleteUrl) {
+    document.getElementById('confirmDeleteLink').href = deleteUrl;
+    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteConfirmModal').classList.add('hidden');
+}
 </script>
+
+<!-- Delete Confirmation Modal matching Screenshot 2 -->
+<div id="deleteConfirmModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-[1px] z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-7 text-center space-y-4">
+        <div class="w-16 h-16 rounded-full border-4 border-amber-200 bg-amber-50 text-amber-500 flex items-center justify-center mx-auto text-3xl font-black">
+            !
+        </div>
+        <div>
+            <h3 class="text-lg font-black text-slate-800">Delete Payment?</h3>
+            <p class="text-xs text-slate-500 mt-1">This action will reverse the credit record.</p>
+        </div>
+        <div class="flex items-center justify-center gap-3 pt-2">
+            <a id="confirmDeleteLink" href="#" class="px-5 py-2.5 rounded-lg bg-[#dc2626] hover:bg-red-700 text-white font-bold text-xs shadow-sm transition-colors">
+                Yes, Delete
+            </a>
+            <button type="button" onclick="closeDeleteModal()" class="px-5 py-2.5 rounded-lg bg-slate-500 hover:bg-slate-600 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - CAALAMI ELECTRONICS ERP</title>
+    <title>Sign In - AMAANI ELECTRONICS ERP</title>
     <!-- Pre-paint Zoom Enforcement -->
     <script>
         (function() {
@@ -100,17 +100,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
             <div>
                 <!-- Brand Logo matching screenshot styling -->
                 <div class="flex flex-col items-center justify-center mb-6">
-                    <div class="flex items-center gap-2.5">
-                        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#c00000] to-red-500 flex items-center justify-center text-white shadow-md shadow-red-900/40 font-black text-sm">
-                            CE
-                        </div>
-                        <div class="text-left">
-                            <span class="font-black text-base tracking-wider text-[#c00000] uppercase block leading-tight">CAALAMI</span>
-                            <span class="text-[9px] text-amber-500 font-bold uppercase tracking-widest block leading-tight">Supermarket &amp; Electronics</span>
-                        </div>
+                    <div class="flex flex-col items-center">
+                        <img src="assets/images/amaani-logo.jpg" alt="Amaani Electronics" class="h-16 w-auto object-contain mb-1">
                     </div>
 
-                    <h1 class="text-lg sm:text-xl font-black text-slate-800 mt-5">Welcome Back</h1>
+                    <h1 class="text-lg sm:text-xl font-black text-slate-800 mt-4">Welcome Back</h1>
                     <p class="text-xs text-slate-400 font-medium mt-0.5">Enter your credentials to access the portal</p>
                 </div>
 
@@ -178,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                     Powered by <strong class="text-slate-700 font-bold">Taam Solutions</strong> &copy; 2026
                 </p>
                 <p class="text-[9px] text-slate-400 font-mono font-medium">
-                    Caalami Enterprise V2.0
+                    Amaani Enterprise V2.0
                 </p>
             </div>
         </div>
@@ -195,24 +189,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login_submit'])) {
                 <!-- Pill Badge matching screenshot -->
                 <div>
                     <span class="inline-block bg-white/10 backdrop-blur-xs text-white/90 text-[10px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider border border-white/10">
-                        CAALAMI SUPERMARKET &amp; ELECTRONICS
+                        AMAANI SUPERMARKET &amp; ELECTRONICS
                     </span>
                 </div>
 
                 <!-- Main Headline matching screenshot -->
                 <div>
                     <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight leading-snug">
-                        Caalami – <span class="text-amber-400">Supermarket &amp; Electronics</span>
+                        Amaani – <span class="text-amber-400">Supermarket &amp; Electronics</span>
                     </h2>
                 </div>
 
                 <!-- Description Paragraphs matching screenshot -->
                 <div class="space-y-4 text-xs text-slate-300 leading-relaxed font-normal">
                     <p>
-                        Caalami Supermarket &amp; Electronics is a leading retail destination providing quality supermarket essentials, fresh provisions, consumer electronics, and smart modern appliances. Designed to streamline business operations, our enterprise management system coordinates point-of-sale checkout, multi-branch inventory control, and real-time financial tracking.
+                        Amaani Supermarket &amp; Electronics is a leading retail destination providing quality supermarket essentials, fresh provisions, consumer electronics, and smart modern appliances. Designed to streamline business operations, our enterprise management system coordinates point-of-sale checkout, multi-branch inventory control, and real-time financial tracking.
                     </p>
                     <p class="text-slate-300/90">
-                        Dedicated to fresh quality products and customer satisfaction, Caalami delivers reliable supermarket retail, consumer electronics, efficient supply distribution, and unified accounting for modern business growth.
+                        Dedicated to fresh quality products and customer satisfaction, Amaani delivers reliable supermarket retail, consumer electronics, efficient supply distribution, and unified accounting for modern business growth.
                     </p>
                 </div>
             </div>

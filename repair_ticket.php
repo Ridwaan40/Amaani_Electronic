@@ -29,7 +29,7 @@ $balanceDue = max(0, floatval($job['total_amount']) - floatval($job['paid_amount
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repair Ticket #<?= htmlspecialchars($job['job_number']) ?> - CAALAMI ELECTRONICS</title>
+    <title>Repair Ticket #<?= htmlspecialchars($job['job_number']) ?> - AMAANI ELECTRONICS</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -62,11 +62,9 @@ $balanceDue = max(0, floatval($job['total_amount']) - floatval($job['paid_amount
         <!-- Header & Logo -->
         <div class="flex items-start justify-between border-b pb-4 border-slate-200">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-2xl bg-[#c00000] text-white flex items-center justify-center font-black text-lg shadow-md">
-                    CE
-                </div>
+                <img src="assets/images/amaani-logo.jpg" alt="Amaani Electronics" class="h-12 w-auto object-contain">
                 <div>
-                    <h1 class="text-base font-black text-[#c00000] uppercase tracking-wider">CAALAMI ELECTRONICS</h1>
+                    <h1 class="text-base font-black text-[#c00000] uppercase tracking-wider">AMAANI ELECTRONICS</h1>
                     <p class="text-xs text-slate-500 font-semibold uppercase">Supermarket &amp; Electronics &bull; Repair Center</p>
                     <p class="text-[11px] text-slate-400">Boorama Branch &bull; Tel: +252 63 4531454</p>
                 </div>

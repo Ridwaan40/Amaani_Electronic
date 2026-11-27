@@ -312,11 +312,9 @@ foreach ($piRows as $pi) {
             <!-- Header -->
             <div class="flex items-start justify-between">
                 <div class="flex items-start gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#c00000] to-red-600 text-white flex items-center justify-center font-black text-xl shadow-xs shrink-0">
-                        CE
-                    </div>
+                    <img src="assets/images/amaani-logo.jpg" alt="Amaani Electronics" class="h-12 w-auto object-contain shrink-0">
                     <div>
-                        <h1 class="text-base font-black text-[#c00000] uppercase tracking-wide">CAALAMI ELECTRONICS</h1>
+                        <h1 class="text-base font-black text-[#c00000] uppercase tracking-wide">AMAANI ELECTRONICS</h1>
                         <p class="text-[11px] text-slate-600 font-medium">Hoyga Qalabka Elektaroonigga ah &amp; Qalabka Casriga ah</p>
                         <p class="text-[10px] text-slate-400">Sisibta, Borama, Somaliland</p>
                         <p class="text-[10px] text-slate-400">Tel: 634547497 / 0634515815 | Zaad: 509900 | eDahab: 721118</p>

@@ -290,7 +290,7 @@ try {
         </div>
         <div class="p-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-medium">
             <span>Showing <?= count($products) ?> of <?= $totalCount ?> total inventory items</span>
-            <span class="font-bold">CAALAMI ELECTRONICS ERP</span>
+            <span class="font-bold">AMAANI ELECTRONICS ERP</span>
         </div>
     </div>
 </main>

@@ -630,11 +630,9 @@ foreach ($items as $it) {
         <!-- Header -->
         <div class="flex items-start justify-between">
             <div class="flex items-start gap-3">
-                <div class="w-12 h-12 rounded-xl bg-[#c00000] text-white flex items-center justify-center font-black text-xl">
-                    CE
-                </div>
+                <img src="assets/images/amaani-logo.jpg" alt="Amaani Electronics" class="h-12 w-auto object-contain">
                 <div>
-                    <h1 class="text-base font-black text-[#c00000] uppercase tracking-wide">CAALAMI ELECTRONICS</h1>
+                    <h1 class="text-base font-black text-[#c00000] uppercase tracking-wide">AMAANI ELECTRONICS</h1>
                     <p class="text-xs text-slate-600 font-medium">Hoyga Qalabka Elektaroonigga ah &amp; Qalabka Casriga ah</p>
                     <p class="text-[11px] text-slate-400">Sisibta, Borama, Somaliland</p>
                     <p class="text-[11px] text-slate-400">Tel: 634547497</p>
@@ -736,7 +734,7 @@ foreach ($items as $it) {
         <!-- Footer -->
         <div class="border-t-2 border-[#c00000] pt-3 text-center text-[10px] text-slate-500 space-y-0.5">
             <div>
-                <span class="font-black text-[#c00000]">CAALAMI ELECTRONICS</span> • Hoyga Qalabka Elektaroonigga ah &amp; Qalabka Casriga ah
+                <span class="font-black text-[#c00000]">AMAANI ELECTRONICS</span> • Hoyga Qalabka Elektaroonigga ah &amp; Qalabka Casriga ah
             </div>
             <div>
                 Tel: 634547497 / 0634515815 &nbsp;|&nbsp; 

@@ -169,7 +169,7 @@
 <!-- ========================================== -->
 <div id="printable-receipt" class="hidden p-6 max-w-md mx-auto text-black">
     <div class="text-center pb-3 border-b border-black">
-        <h2 class="text-lg font-black tracking-tight uppercase">CAALAMI ELECTRONICS</h2>
+        <h2 class="text-lg font-black tracking-tight uppercase">AMAANI ELECTRONICS</h2>
         <p class="text-xs">Hoyga Qalabka Elektaroonigga ah &amp; Casriga ah</p>
         <p class="text-[10px]">Boorama Main Branch · Tel: +252 63 4452100</p>
     </div>
