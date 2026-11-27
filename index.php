@@ -82,8 +82,8 @@ $supplierPayablesVal = floatval($supData['total_supplier_debt']);
 $operatingExpensesVal = 0.00;
 $repairRevenueVal = 0.00;
 
-// Net Profit: Sales Margin from sale_items (unit_price - wholesale_price) * qty
-$marginSql = "SELECT COALESCE(SUM((unit_price - wholesale_price) * qty), 0) as margin FROM sale_items";
+// Net Profit: Sales Margin from sale_items (unit_price - wholesale_price) * qty — exclude returned items
+$marginSql = "SELECT COALESCE(SUM((unit_price - wholesale_price) * qty), 0) as margin FROM sale_items WHERE COALESCE(sale_type, 'Retail') != 'Returned'";
 $marginRow = $pdo->query($marginSql)->fetch();
 $netProfitVal = floatval($marginRow['margin'] ?? 0);
 $customerDueVal = floatval($kpi['total_debt']);

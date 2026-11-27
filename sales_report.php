@@ -18,6 +18,7 @@ $detailStmt = $pdo->prepare("
     FROM sale_items si
     LEFT JOIN sales s ON (si.sale_id = s.id OR (si.sale_id IS NULL AND si.transaction_id = s.invoice_number))
     WHERE $branchCond
+      AND COALESCE(si.sale_type, 'Retail') != 'Returned'
       AND DATE(COALESCE(s.sale_date, si.created_at, CURDATE())) >= ?
       AND DATE(COALESCE(s.sale_date, si.created_at, CURDATE())) <= ?
     ORDER BY display_date DESC, si.id DESC
