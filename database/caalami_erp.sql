@@ -118,7 +118,7 @@ CREATE TABLE `customers` (
 LOCK TABLES `customers` WRITE;
 /*!40000 ALTER TABLE `customers` DISABLE KEYS */;
 INSERT INTO `customers` VALUES
-(1,'walk-in','Walk-In Customer','',10.00,'Boorama Branch','Boorama',NULL,'Admin','2026-11-22'),
+(1,'walk-in','Walk-In Customer','',20.00,'Boorama Branch','Boorama',NULL,'Admin','2026-11-22'),
 (5,'cust-04','SAMATAR ELECTRONICS','+252 63 4771234',0.00,'Boorama Branch','Boorama',NULL,'Admin','2026-11-22'),
 (6,'cust-05','GOLIS TELECOM','+252 63 4118899',0.00,'Boorama Branch','Boorama',NULL,'Admin','2026-11-22'),
 (9,'MC-005','SALIS OF 19/2/26','0634531454',0.00,'Boorama Branch','Boorama','-','Admin','2026-02-25'),
@@ -132,7 +132,7 @@ INSERT INTO `customers` VALUES
 (21,'MC-021','Nuur aadan buraale','634500768',10.00,'Boorama Branch','BORAMA','','Ridwaan Admin','2026-11-25'),
 (22,'MC-022','raadiya','0634458536',12.00,'Boorama Branch','BORAMA','','Ridwaan Admin','2026-11-26'),
 (23,'MC-023','Hayaat Mohamed Cawaale','634555252',13.00,'Boorama Branch','BORAMA','','Ridwaan Admin','2026-11-26'),
-(24,'MC-024','khayre muuse','0637108616',6.50,'Boorama Branch','BORAMA','','Ridwaan Admin','2026-11-26');
+(24,'MC-024','khayre muuse','0637108616',0.00,'Boorama Branch','BORAMA','','Ridwaan Admin','2026-11-26');
 /*!40000 ALTER TABLE `customers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -276,7 +276,7 @@ CREATE TABLE `payments` (
   PRIMARY KEY (`id`),
   KEY `sale_id` (`sale_id`),
   CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -285,6 +285,10 @@ CREATE TABLE `payments` (
 
 LOCK TABLES `payments` WRITE;
 /*!40000 ALTER TABLE `payments` DISABLE KEYS */;
+INSERT INTO `payments` VALUES
+(14,NULL,'REC-351',6.50,'Zaad Services',NULL,NULL,'2026-11-27 15:30:52','khayre muuse','0637108616','Return Credits',6.50,0.00,0.00,'Boorama Branch','Ridwaan Admin'),
+(15,11,'#11',3.00,'Cash On Hand','REF-617359','Initial payment at POS','2026-11-27 18:06:25',NULL,NULL,'Return Credits',0.00,0.00,0.00,'Boorama Branch','Ridwaan'),
+(16,12,'#12',8.00,'Cash On Hand','REF-449845','Initial payment at POS','2026-11-27 18:06:40',NULL,NULL,'Return Credits',0.00,0.00,0.00,'Boorama Branch','Ridwaan');
 /*!40000 ALTER TABLE `payments` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -353,7 +357,7 @@ CREATE TABLE `products` (
   `notes` text DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `code` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -363,9 +367,9 @@ CREATE TABLE `products` (
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
 INSERT INTO `products` VALUES
-(27,'SUPERX-398','SUPER X GLASS','GLASS','GLASS','GLASS','','',1.00,0.00,55,5,'📱','Pcs',0.00,0.00,0.00,'Socdaal mobile accessories','Ridwaan','2026-11-22','',NULL),
+(27,'SUPERX-398','SUPER X GLASS','GLASS','GLASS','GLASS','','',1.00,0.00,54,5,'📱','Pcs',0.00,0.00,0.00,'Socdaal mobile accessories','Ridwaan','2026-11-22','',NULL),
 (28,'CABLEC-723','CABLE-C','CABLE','Type-C to Type-C 100W Cable','Type-C to Type-C 100W Cable','','',1.00,0.00,19,5,'📱','Pcs',0.00,0.00,0.00,'Socdaal mobile accessories','Ridwaan','2026-11-22','',NULL),
-(29,'TECNOMO-188','TECNO MOBILE','PHONE','PHONE','PHONE','','',8.00,0.00,4,5,'📱','Pcs',7.00,0.00,0.00,'DUBIA','Admin','2026-11-22','2000020448205',''),
+(29,'TECNOMO-188','TECNO MOBILE','PHONE','PHONE','PHONE','','',8.00,0.00,3,5,'📱','Pcs',7.00,0.00,0.00,'DUBIA','Admin','2026-11-22','2000020448205',''),
 (30,'AIRPODS-337','AIRPODS MAX','EARPHONE','Airpods Pro / Max','Airpods Pro / Max','','',10.00,0.00,1,5,'📱','Pcs',9.00,0.00,0.00,'Socdaal mobile accessories','Admin','2026-11-23','2000057009868',''),
 (31,'LCDOPPO-319','LCD OPPO A77S BLK ORG','PHONE PARTS','LCD Screens','LCD Screens','','',10.00,0.00,0,5,'📱','Pcs',7.00,0.00,0.00,'DUBIA','Admin','2026-11-23','2000018694613',''),
 (32,'SAMSUNG-366','Samsung Cover','PHONE COVER','Clear MagSafe Case','Clear MagSafe Case','','',2.00,0.00,29,5,'📱','Pcs',1.50,0.00,0.00,'Socdaal mobile accessories','Admin','2026-11-23','2000028284892',''),
@@ -379,10 +383,13 @@ INSERT INTO `products` VALUES
 (40,'LCDA11-188','LCD A11 SAM BLK ORG 100%','PHONE PARTS','LCD Screens','LCD Screens','','',8.00,0.00,2,5,'📱','Pcs',7.50,0.00,0.00,'DUBIA','Admin','2026-11-26','2000067725785',''),
 (41,'LCDA02S-427','LCD A02S SAM BLK ORG 100%','PHONE PARTS','LCD Screens','LCD Screens','','',8.00,0.00,1,5,'📱','Pcs',7.50,0.00,0.00,'DUBIA','Admin','2026-11-26','2000024917392',''),
 (42,'LCDINFI-591','LCD INFINIX HOT 50 / X670/ SMART 9 BLK ORG','PHONE PARTS','LCD Screens','LCD Screens','','',8.00,0.00,1,5,'📱','Pcs',6.00,0.00,0.00,'DUBIA','Admin','2026-11-26','2000058409354',''),
-(43,'LCDA047-616','LCD A047/A136 SAM BLK ORG 100%','PHONE PARTS','LCD Screens','LCD Screens','','',8.00,0.00,1,5,'📱','Pcs',7.00,0.00,0.00,'DUBIA','Admin','2026-11-26','2000047010427',''),
+(43,'LCDA047-616','LCD A047/A136 SAM BLK ORG 100%','PHONE PARTS','LCD Screens','LCD Screens','','',8.00,7.50,1,5,'📱','Pcs',7.50,0.00,0.00,'DUBIA','Admin','2026-11-26','2000047010427',''),
 (44,'LCDIPH-785','LCD IPH XSMAX GX ORG','PHONE PARTS','LCD Screens','LCD Screens','','',23.00,0.00,0,5,'📱','Pcs',21.50,0.00,0.00,'DUBIA','Admin','2026-11-26','2000020351970',''),
 (45,'A13ONO-627','A13 ON/OFF SAM ORG','PHONE PARTS','POWER','POWER','','',2.00,0.00,1,5,'📱','Pcs',1.00,0.00,0.00,'DUBIA','Admin','2026-11-26','2000030718610',''),
-(46,'LCDA16-121','LCD A16 INCELL SAM BLK ORG 100%','PHONE PARTS','LCD Screens','LCD Screens','','',9.00,0.00,1,5,'📱','Pcs',7.00,0.00,0.00,'DUBIA','Admin','2026-11-26','2000081190773','');
+(46,'LCDA16-121','LCD A16 INCELL SAM BLK ORG 100%','PHONE PARTS','LCD Screens','LCD Screens','','',9.00,0.00,1,5,'📱','Pcs',7.00,0.00,0.00,'DUBIA','Admin','2026-11-26','2000081190773',''),
+(47,'SAMSUNG-372','Samsung Charger 25w','CHARGER','20W PD Fast Charger','20W PD Fast Charger','','',3.00,0.00,5,5,'📱','Pcs',1.80,0.00,0.00,'DUBIA','Admin','2026-11-27','2000063333060',''),
+(48,'MICROCH-107','micro charger','CHARGER','20W PD Fast Charger','20W PD Fast Charger','','',2.00,0.00,1,5,'📱','Pcs',1.50,0.00,0.00,'Socdaal mobile accessories','Admin','2026-11-27','2000099996714',''),
+(49,'LCDA055-108','LCD A055 SAM BLK ORG 100%','PHONE PARTS','LCD Screens','LCD Screens','','',8.00,0.00,1,5,'📱','Pcs',7.00,0.00,0.00,'DUBIA','Admin','2026-11-27','2000041592838','');
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -410,7 +417,7 @@ CREATE TABLE `purchase_items` (
   `created_user` varchar(100) DEFAULT 'Ridwaan',
   `purchased_date` datetime DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1182 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1183 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -423,7 +430,8 @@ INSERT INTO `purchase_items` VALUES
 (1178,5,'Samsung Galaxy A20 4G','Mobile',1,'Pcs',280.00,0.00,280.00,0.00,280.00,1,'RIDWAAN HUSSEIN','Ridwaan','2026-11-20 22:57:11'),
 (1179,6,'Samsung Galaxy A30 4G','Accessories',2,'Pcs',300.00,0.00,300.00,0.00,600.00,2,'RIDWAAN HUSSEIN','Ridwaan','2026-11-20 23:28:50'),
 (1180,7,'SUPER X GLASS','GLASS',60,'Pcs',0.28,0.00,0.28,0.00,16.80,60,'Socdaal mobile accessories','Ridwaan','2026-11-22 17:24:49'),
-(1181,8,'CABLE-C','Accessories',20,'Pcs',0.70,0.00,0.70,0.00,14.00,20,'Socdaal mobile accessories','Ridwaan','2026-11-22 17:26:35');
+(1181,8,'CABLE-C','Accessories',20,'Pcs',0.70,0.00,0.70,0.00,14.00,20,'Socdaal mobile accessories','Ridwaan','2026-11-22 17:26:35'),
+(1182,9,'LCD A047/A136 SAM BLK ORG 100%','PHONE PARTS',1,'Pcs',7.50,0.00,7.50,8.00,7.50,1,'CAALAMI ELETRONIC','Ridwaan','2026-11-27 21:12:53');
 /*!40000 ALTER TABLE `purchase_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -492,7 +500,7 @@ CREATE TABLE `purchases` (
   `notes` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -505,7 +513,8 @@ INSERT INTO `purchases` VALUES
 (5,'#2983','RIDWAAN HUSSEIN','634578264','Boorama Branch','2026-11-20','2026-11-20','Credit',280.00,0.00,280.00,0.00,0.00,280.00,'ZAAD','Ridwaan',NULL,'2026-11-20 19:57:11'),
 (6,'#4291','RIDWAAN HUSSEIN','634578264','Boorama Branch','2026-11-20','2026-11-20','Credit',600.00,0.00,600.00,0.00,0.00,600.00,'ZAAD','Ridwaan',NULL,'2026-11-20 20:28:50'),
 (7,'#2665','Socdaal mobile accessories','634706094','Boorama Branch','2026-11-22','2026-11-22','Credit',16.80,0.00,16.80,0.00,0.00,16.80,'ZAAD','Ridwaan',NULL,'2026-11-22 14:24:49'),
-(8,'#4677','Socdaal mobile accessories','634706094','Boorama Branch','2026-11-22','2026-11-22','Credit',14.00,0.00,14.00,0.00,0.00,14.00,'ZAAD','Ridwaan',NULL,'2026-11-22 14:26:35');
+(8,'#4677','Socdaal mobile accessories','634706094','Boorama Branch','2026-11-22','2026-11-22','Credit',14.00,0.00,14.00,0.00,0.00,14.00,'ZAAD','Ridwaan',NULL,'2026-11-22 14:26:35'),
+(9,'#8883','CAALAMI ELETRONIC','633404186','Boorama Branch','2026-11-27','2026-11-27','Credit',7.50,0.00,7.50,0.00,0.00,7.50,'ZAAD','Ridwaan',NULL,'2026-11-27 18:12:53');
 /*!40000 ALTER TABLE `purchases` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -560,7 +569,7 @@ CREATE TABLE `repair_job_parts` (
   `price` decimal(10,2) DEFAULT 0.00,
   `total` decimal(10,2) DEFAULT 0.00,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -580,7 +589,9 @@ INSERT INTO `repair_job_parts` VALUES
 (12,7,27,'SUPER X GLASS',1,1.00,1.00),
 (13,8,43,'LCD A047/A136 SAM BLK ORG 100%',1,8.00,8.00),
 (14,8,27,'SUPER X GLASS',1,1.00,1.00),
-(15,9,44,'LCD IPH XSMAX GX ORG',1,23.00,23.00);
+(15,9,44,'LCD IPH XSMAX GX ORG',1,23.00,23.00),
+(16,10,43,'LCD A047/A136 SAM BLK ORG 100%',1,8.00,8.00),
+(17,10,27,'SUPER X GLASS',1,1.00,1.00);
 /*!40000 ALTER TABLE `repair_job_parts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -622,7 +633,7 @@ CREATE TABLE `repair_jobs` (
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `job_number` (`job_number`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -637,7 +648,8 @@ INSERT INTO `repair_jobs` VALUES
 (6,'REP-20261125-2851',21,'Nuur aadan buraale','634500768','IPHONE 13 PRO MAX','','','','waxa laga badalayay screen iyo speaker ka','',2,'Abdirahman Daud',5.00,NULL,'Charger Repair + screening',13.00,37.00,0.00,50.00,40.00,'Delivered','Zaad Services','2026-11-25','2026-11-26','Boorama Branch','Ridwaan Admin','2026-11-25 19:18:44'),
 (7,'REP-20261126-6059',22,'raadiya','0634458536','A13','','','','display laga badalaayay','',2,'Abdirahman Daud',2.00,NULL,'screening',2.00,10.00,0.00,12.00,0.00,'Delivered','Cash','2026-11-26','2026-11-27','Boorama Branch','Ridwaan Admin','2026-11-26 19:01:28'),
 (8,'REP-20261126-9003',23,'Hayaat Mohamed Cawaale','634555252','A13','','','','display change','',2,'Abdirahman Daud',2.00,NULL,'screening',4.00,9.00,0.00,13.00,0.00,'Delivered','Cash','2026-11-26','2026-11-27','Boorama Branch','Ridwaan Admin','2026-11-26 19:56:39'),
-(9,'REP-20261126-9844',24,'khayre muuse','0637108616','xs max','','','','display change','',2,'Abdirahman Daud',2.00,NULL,'screening',5.00,23.00,0.00,28.00,21.50,'Delivered','Cash','2026-11-26','2026-11-27','Boorama Branch','Ridwaan Admin','2026-11-26 20:03:30');
+(9,'REP-20261126-9844',24,'khayre muuse','0637108616','xs max','','','','display change','',2,'Abdirahman Daud',2.00,NULL,'screening',5.00,23.00,0.00,28.00,28.00,'Delivered','Cash','2026-11-26','2026-11-27','Boorama Branch','Ridwaan Admin','2026-11-26 20:03:30'),
+(10,'REP-20261127-4862',1,'Walk-In Customer','','A13','','','','display change','',2,'Abdirahman Daud',2.00,NULL,'screening',4.00,9.00,0.00,13.00,13.00,'Delivered','Cash','2026-11-27','2026-11-28','Boorama Branch','Ridwaan Admin','2026-11-27 18:38:18');
 /*!40000 ALTER TABLE `repair_jobs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -700,7 +712,7 @@ CREATE TABLE `sale_items` (
   PRIMARY KEY (`id`),
   KEY `sale_id` (`sale_id`),
   CONSTRAINT `sale_items_ibfk_1` FOREIGN KEY (`sale_id`) REFERENCES `sales` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -718,7 +730,10 @@ INSERT INTO `sale_items` VALUES
 (8,7,27,'SUPER X GLASS',1,1.00,1.00,'Pcs',1.00,0.00,0.00,0.00,1.00,'Retail','Boorama Branch','#7','Ridwaan','2026-11-23'),
 (9,8,32,'Samsung Cover',1,2.00,2.00,'Pcs',2.00,0.00,0.00,0.00,2.00,'Retail','Boorama Branch','#8','Ridwaan','2026-11-23'),
 (10,8,27,'SUPER X GLASS',1,1.00,1.00,'Pcs',1.00,0.00,0.00,0.00,1.00,'Retail','Boorama Branch','#8','Ridwaan','2026-11-23'),
-(11,9,37,'LCD A17 INCELL FRAME',1,10.00,10.00,'Pcs',10.00,0.00,0.00,0.00,10.00,'Retail','Boorama Branch','#9','Ridwaan Admin','2026-11-26');
+(11,9,37,'LCD A17 INCELL FRAME',1,10.00,10.00,'Pcs',10.00,0.00,0.00,0.00,10.00,'Returned','Boorama Branch','#9','Ridwaan Admin','2026-11-26'),
+(12,10,37,'LCD A17 INCELL FRAME',1,10.00,10.00,'Pcs',10.00,0.00,0.00,0.00,10.00,'Returned','Boorama Branch','#10','Ridwaan Admin','2026-11-27'),
+(13,11,47,'Samsung Charger 25w',1,3.00,3.00,'Pcs',3.00,0.00,0.00,0.00,3.00,'Retail','Boorama Branch','#11','Ridwaan Admin','2026-11-27'),
+(14,12,29,'TECNO MOBILE',1,8.00,8.00,'Pcs',8.00,0.00,0.00,0.00,8.00,'Retail','Boorama Branch','#12','Ridwaan Admin','2026-11-27');
 /*!40000 ALTER TABLE `sale_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -750,7 +765,7 @@ CREATE TABLE `sales` (
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `invoice_number` (`invoice_number`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -766,7 +781,10 @@ INSERT INTO `sales` VALUES
 (6,'#6','Walk-In Customer','+252 63 4001923','Boorama Branch','2026-11-23','2026-11-30','2026','November',13.00,0.00,13.00,13.00,'Cash On Hand','','1x AIRPODS MAX','Paid','2026-11-23 15:37:02'),
 (7,'#7','UMALKHAYR IBRAHIM','634568734','Boorama Branch','2026-11-23','2026-12-05','2026','November',14.00,0.00,14.00,0.00,'Cash On Hand','','1x LCD OPPO A77S BLK ORG, 1x SUPER X GLASS','Due','2026-11-23 16:19:56'),
 (8,'#8','UMALKHAYR IBRAHIM','634568734','Boorama Branch','2026-11-23','2026-11-30','2026','November',3.00,0.00,3.00,0.00,'Cash On Hand','','1x Samsung Cover, 1x SUPER X GLASS','Due','2026-11-23 18:20:28'),
-(9,'#9','Walk-In Customer','+252 63 4001923','Boorama Branch','2026-11-26','2026-11-29','2026','November',10.00,0.00,10.00,0.00,'Cash On Hand','','1x LCD A17 INCELL FRAME','Due','2026-11-26 19:14:29');
+(9,'#9','Walk-In Customer','+252 63 4001923','Boorama Branch','2026-11-26','2026-11-29','2026','November',10.00,0.00,0.00,0.00,'Cash On Hand','','1x LCD A17 INCELL FRAME','Due','2026-11-26 19:14:29'),
+(10,'#10','Walk-In Customer','+252 63 4001923','Boorama Branch','2026-11-27','2026-12-04','2026','November',10.00,0.00,0.00,0.00,'Cash On Hand','','1x LCD A17 INCELL FRAME','Due','2026-11-27 16:30:04'),
+(11,'#11','Walk-In Customer','+252 63 4001923','Boorama Branch','2026-11-27','2026-12-04','2026','November',3.00,0.00,3.00,3.00,'Cash On Hand','','1x Samsung Charger 25w','Paid','2026-11-27 18:06:25'),
+(12,'#12','Walk-In Customer','+252 63 4001923','Boorama Branch','2026-11-27','2026-12-04','2026','November',8.00,0.00,8.00,8.00,'Cash On Hand','','1x TECNO MOBILE','Paid','2026-11-27 18:06:40');
 /*!40000 ALTER TABLE `sales` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -875,7 +893,7 @@ LOCK TABLES `suppliers` WRITE;
 INSERT INTO `suppliers` VALUES
 (13,'Socdaal mobile accessories','634706094','borama',30.80,'Admin','2026-11-22',NULL),
 (14,'DUBIA','0634000000','BOORAMA',0.00,'Admin','2026-11-22',NULL),
-(15,'CAALAMI ELETRONIC','633404186','BORAMA',0.00,'Admin','2026-11-24',NULL);
+(15,'CAALAMI ELETRONIC','633404186','BORAMA',7.50,'Admin','2026-11-24',NULL);
 /*!40000 ALTER TABLE `suppliers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -906,7 +924,7 @@ LOCK TABLES `technicians` WRITE;
 /*!40000 ALTER TABLE `technicians` DISABLE KEYS */;
 INSERT INTO `technicians` VALUES
 (1,'Ahmed Nur Farah','064434','Mobile & Laptop Repair',6.00,'Active','2026-11-24 16:49:45'),
-(2,'Abdirahman Daud','634547497','General Technician',17.00,'Active','2026-11-25 08:45:34');
+(2,'Abdirahman Daud','634547497','General Technician',19.00,'Active','2026-11-25 08:45:34');
 /*!40000 ALTER TABLE `technicians` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -956,4 +974,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-11-27 18:40:30
+-- Dump completed on 2026-11-27 22:18:50
