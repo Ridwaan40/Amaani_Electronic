@@ -59,7 +59,13 @@ $whereSql = implode(' AND ', $where);
 
 $sql = "
     SELECT r.*,
-        (SELECT COUNT(*) FROM repair_job_parts p WHERE p.repair_id = r.id) AS parts_count
+        (SELECT COUNT(*) FROM repair_job_parts p WHERE p.repair_id = r.id) AS parts_count,
+        COALESCE((
+            SELECT SUM(rjp.total - (rjp.qty * COALESCE(IF(pr.last_price > 0, pr.last_price, pr.wholesale_price), 0)))
+            FROM repair_job_parts rjp
+            LEFT JOIN products pr ON (pr.id = rjp.product_id OR (rjp.product_id IS NULL AND LOWER(TRIM(pr.name)) = LOWER(TRIM(rjp.part_name))))
+            WHERE rjp.repair_id = r.id
+        ), 0) AS parts_profit
     FROM repair_jobs r
     WHERE $whereSql
     ORDER BY r.intake_date DESC, r.id DESC
@@ -73,13 +79,14 @@ $totalJobs     = count($jobs);
 $deliveredCnt  = 0;
 $readyCnt      = 0;
 $fullyCleared  = 0;
-$sumLabor      = 0.00;
-$sumTechCost   = 0.00;
-$sumParts      = 0.00;
-$sumDisc       = 0.00;
-$sumTotal      = 0.00;
-$sumPaid       = 0.00;
-$sumDue        = 0.00;
+$sumLabor       = 0.00;
+$sumTechCost    = 0.00;
+$sumParts       = 0.00;
+$sumPartsProfit = 0.00;
+$sumDisc        = 0.00;
+$sumTotal       = 0.00;
+$sumPaid        = 0.00;
+$sumDue         = 0.00;
 
 foreach ($jobs as $j) {
     if ($j['status'] === 'Delivered') $deliveredCnt++;
@@ -89,15 +96,16 @@ foreach ($jobs as $j) {
     $due  = max(0, $tot - $paid);
     if ($due <= 0.001) $fullyCleared++;
 
-    $sumLabor    += floatval($j['service_cost']);
-    $sumTechCost += floatval($j['technician_cost']);
-    $sumParts    += floatval($j['parts_cost']);
-    $sumDisc     += floatval($j['discount']);
-    $sumTotal    += $tot;
-    $sumPaid     += $paid;
-    $sumDue      += $due;
+    $sumLabor       += floatval($j['service_cost']);
+    $sumTechCost    += floatval($j['technician_cost']);
+    $sumParts       += floatval($j['parts_cost']);
+    $sumPartsProfit += floatval($j['parts_profit'] ?? 0);
+    $sumDisc        += floatval($j['discount']);
+    $sumTotal       += $tot;
+    $sumPaid        += $paid;
+    $sumDue         += $due;
 }
-$netServiceProfit = max(0, $sumLabor - $sumTechCost);
+$netServiceProfit = max(0, ($sumLabor + $sumPartsProfit) - $sumTechCost);
 ?>
 
 <main class="flex-1 min-w-0 space-y-5">
@@ -205,9 +213,9 @@ $netServiceProfit = max(0, $sumLabor - $sumTechCost);
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
-                <span class="text-[10px] font-black uppercase text-red-500 tracking-wider block">LABOR / SERVICES (PROFIT)</span>
+                <span class="text-[10px] font-black uppercase text-red-500 tracking-wider block">REPAIR NET PROFIT</span>
                 <span class="text-2xl font-black text-emerald-600 mt-1 block">$<?= number_format($netServiceProfit, 2) ?></span>
-                <span class="text-[10px] text-slate-400 font-medium mt-1 block">Net profit (after $<?= number_format($sumTechCost, 2) ?> tech)</span>
+                <span class="text-[10px] text-slate-400 font-medium mt-1 block">Service + $<?= number_format($sumPartsProfit, 2) ?> parts &minus; $<?= number_format($sumTechCost, 2) ?> tech</span>
             </div>
 
             <div class="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">

@@ -81,20 +81,29 @@ $supplierPayablesVal = floatval($supData['total_supplier_debt']);
 // 5. Secondary metrics: Operating Expenses & Repair Revenue & Net Profit (Real data)
 $operatingExpensesVal = 0.00;
 
-$rBranchCond = $currentBranch === 'All Branches' ? '1=1' : 'branch = ' . $pdo->quote($currentBranch);
-$rYearCond   = $selectedYear === 'All Years' ? '1=1' : 'YEAR(COALESCE(intake_date, DATE(created_at))) = ' . $pdo->quote($selectedYear);
-$rMonthCond  = $selectedMonth === 'All Months' ? '1=1' : 'MONTHNAME(COALESCE(intake_date, DATE(created_at))) = ' . $pdo->quote($selectedMonth);
+$rBranchCond = $currentBranch === 'All Branches' ? '1=1' : 'r.branch = ' . $pdo->quote($currentBranch);
+$rYearCond   = $selectedYear === 'All Years' ? '1=1' : 'YEAR(COALESCE(r.intake_date, DATE(r.created_at))) = ' . $pdo->quote($selectedYear);
+$rMonthCond  = $selectedMonth === 'All Months' ? '1=1' : 'MONTHNAME(COALESCE(r.intake_date, DATE(r.created_at))) = ' . $pdo->quote($selectedMonth);
 
 $repairSql = "SELECT 
     COUNT(*) as total_jobs,
-    COALESCE(SUM(total_amount), 0) as total_repair_rev,
-    COALESCE(SUM(service_cost - technician_cost), 0) as service_profit
-    FROM repair_jobs
-    WHERE status != 'Cancelled' AND $rBranchCond AND $rYearCond AND $rMonthCond";
+    COALESCE(SUM(r.total_amount), 0) as total_repair_rev,
+    COALESCE(SUM(r.service_cost - r.technician_cost), 0) as service_profit
+    FROM repair_jobs r
+    WHERE r.status != 'Cancelled' AND $rBranchCond AND $rYearCond AND $rMonthCond";
 $repairData = $pdo->query($repairSql)->fetch();
+
+$partsProfitSql = "SELECT 
+    COALESCE(SUM(rjp.total - (rjp.qty * COALESCE(IF(p.last_price > 0, p.last_price, p.wholesale_price), 0))), 0) as parts_profit
+    FROM repair_job_parts rjp
+    INNER JOIN repair_jobs r ON r.id = rjp.repair_id
+    LEFT JOIN products p ON (p.id = rjp.product_id OR (rjp.product_id IS NULL AND LOWER(TRIM(p.name)) = LOWER(TRIM(rjp.part_name))))
+    WHERE r.status != 'Cancelled' AND $rBranchCond AND $rYearCond AND $rMonthCond";
+$partsProfitVal = floatval($pdo->query($partsProfitSql)->fetchColumn() ?: 0);
+
 $repairJobsCount  = intval($repairData['total_jobs'] ?? 0);
 $repairRevenueVal = floatval($repairData['total_repair_rev'] ?? 0);
-$repairProfitVal  = max(0.00, floatval($repairData['service_profit'] ?? 0));
+$repairProfitVal  = max(0.00, floatval($repairData['service_profit'] ?? 0) + $partsProfitVal);
 
 // Net Profit: Sales Margin from sale_items (unit_price - wholesale_price) * qty — exclude returned items + Repair Margin
 $marginSql = "SELECT COALESCE(SUM((unit_price - wholesale_price) * qty), 0) as margin FROM sale_items WHERE COALESCE(sale_type, 'Retail') != 'Returned'";
@@ -479,7 +488,7 @@ $deptLabel = $currentBranch === 'All Branches' ? 'All Departments (Global)' : $c
                         <span class="text-[9px] font-extrabold bg-blue-50 text-blue-600 px-1.5 py-0.2 rounded font-mono"><?= $repairJobsCount ?> <?= $repairJobsCount === 1 ? 'JOB' : 'JOBS' ?></span>
                     </div>
                     <span class="text-lg font-black text-slate-800 block mt-0.5">$<?= number_format($repairRevenueVal, 2) ?></span>
-                    <span class="text-[10px] text-slate-400 font-medium block">Service Profit: $<?= number_format($repairProfitVal, 2) ?></span>
+                    <span class="text-[10px] text-slate-400 font-medium block">Repair Profit: $<?= number_format($repairProfitVal, 2) ?></span>
                 </div>
             </div>
         </div>
